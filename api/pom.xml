@@ -4,19 +4,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.md-5</groupId>
-        <artifactId>bungeecord-parent</artifactId>
+        <groupId>net.gatesofender</groupId>
+        <artifactId>occystrap-parent</artifactId>
         <version>1.6.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>net.md-5</groupId>
-    <artifactId>bungeecord-api</artifactId>
+    <groupId>net.gatesofender</groupId>
+    <artifactId>occystrap-api</artifactId>
     <version>1.6.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>BungeeCord-API</name>
-    <description>API implemented by the Elastic Portal Suite</description>
+    <name>OccyStrap-API</name>
+    <description>API implemented by the OccyStrap</description>
 
     <dependencies>
         <dependency>
@@ -26,14 +26,14 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-event</artifactId>
+            <groupId>net.gatesofender</groupId>
+            <artifactId>occystrap-event</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-protocol</artifactId>
+            <groupId>net.gatesofender</groupId>
+            <artifactId>occystrap-protocol</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

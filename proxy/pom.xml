@@ -4,19 +4,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.md-5</groupId>
-        <artifactId>bungeecord-parent</artifactId>
+        <groupId>net.gatesofender</groupId>
+        <artifactId>occystrap-parent</artifactId>
         <version>1.6.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>net.md-5</groupId>
-    <artifactId>bungeecord-proxy</artifactId>
+    <groupId>net.gatesofender</groupId>
+    <artifactId>occystrap-proxy</artifactId>
     <version>1.6.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>BungeeCord-Proxy</name>
-    <description>Proxy component of the Elastic Portal Suite</description>
+    <name>OccyStrap-Proxy</name>
+    <description>Proxy component of OccyStrap</description>
 
     <dependencies>
         <dependency>
@@ -38,14 +38,14 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-protocol</artifactId>
+            <groupId>net.gatesofender</groupId>
+            <artifactId>occystrap-protocol</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
+            <groupId>net.gatesofender</groupId>
+            <artifactId>occystrap-api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -70,7 +70,7 @@
     </dependencies>
 
     <build>
-        <finalName>BungeeCord</finalName>
+        <finalName>OccyStrap</finalName>
         <plugins>
             <plugin>
                 <!-- Don't deploy proxy to maven repo, only APIs -->

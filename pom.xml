@@ -9,18 +9,18 @@
         <version>7</version>
     </parent>
 
-    <groupId>net.md-5</groupId>
-    <artifactId>bungeecord-parent</artifactId>
+    <groupId>net.gatesofender</groupId>
+    <artifactId>occystrap-parent</artifactId>
     <version>1.6.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>BungeeCord</name>
-    <description>Parent project for all BungeeCord modules.</description>
-    <url>https://github.com/ElasticPortalSuite/BungeeCord</url>
+    <name>OccyStrap</name>
+    <description>Parent project for all OccyStrap modules.</description>
+    <url>https://github.com/GoEnder/OccyStrap</url>
     <inceptionYear>2012</inceptionYear>
     <organization>
-        <name>Elastic Portal Suite</name>
-        <url>https://github.com/ElasticPortalSuite</url>
+        <name>GoEnder</name>
+        <url>https://github.com/GoEnder</url>
     </organization>
     <licenses>
         <license>
@@ -34,6 +34,9 @@
         <developer>
             <id>md_5</id>
         </developer>
+        <developer>
+            <id>roblabla</id>
+        </developer>
     </developers>
 
     <modules>
@@ -44,17 +47,17 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git@github.com:ElasticPortalSuite/BungeeCord.git</connection>
-        <developerConnection>scm:git:git@github.com:ElasticPortalSuite/BungeeCord.git</developerConnection>
-        <url>git@github.com:ElasticPortalSuite/BungeeCord.git</url>
+        <connection>scm:git:git@github.com:GoEnder/OccyStrap.git</connection>
+        <developerConnection>scm:git:git@github.com:GoEnder/OccyStrap.git</developerConnection>
+        <url>git@github.com:GoEnder/OccyStrap.git</url>
     </scm>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/ElasticPortalSuite/BungeeCord/issues</url>
+        <url>https://github.com/GoEnder/OccyStrap/issues</url>
     </issueManagement>
     <ciManagement>
         <system>jenkins</system>
-        <url>http://ci.md-5.net/job/BungeeCord</url>
+        <url>http://ci.gatesofender.net/job/OccyStrap</url>
     </ciManagement>
 
     <properties>

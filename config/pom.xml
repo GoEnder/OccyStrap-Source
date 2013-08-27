@@ -4,19 +4,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.md-5</groupId>
-        <artifactId>bungeecord-parent</artifactId>
+        <groupId>net.gatesofender</groupId>
+        <artifactId>occystrap-parent</artifactId>
         <version>1.6.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>net.md-5</groupId>
-    <artifactId>bungeecord-config</artifactId>
+    <artifactId>occystrap-config</artifactId>
     <version>1.6.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>BungeeCord-Config</name>
-    <description>Generic java configuration API intended for use with BungeeCord</description>
+    <name>OccyStrap-Config</name>
+    <description>Generic java configuration API intended for use with OccyStrap</description>
     
     <dependencies>
         <dependency>

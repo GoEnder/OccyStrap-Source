@@ -4,14 +4,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.util.List;
-import javax.crypto.Cipher;
+import org.bouncycastle.crypto.BufferedBlockCipher;
 
 public class CipherDecoder extends MessageToMessageDecoder<ByteBuf>
 {
 
     private final CipherBase cipher;
 
-    public CipherDecoder(Cipher cipher)
+    public CipherDecoder(BufferedBlockCipher cipher)
     {
         this.cipher = new CipherBase( cipher );
     }

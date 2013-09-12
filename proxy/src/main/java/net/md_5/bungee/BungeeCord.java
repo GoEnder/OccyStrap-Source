@@ -55,6 +55,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.api.tab.CustomTabList;
+import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.command.*;
 import net.md_5.bungee.config.YamlConfig;
 import net.md_5.bungee.log.LoggingOutputStream;
@@ -65,6 +66,7 @@ import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
 import net.md_5.bungee.protocol.Vanilla;
 import net.md_5.bungee.query.QueryServerHandler;
 import net.md_5.bungee.tab.Custom;
+import net.md_5.bungee.tab.GlobalPing;
 import net.md_5.bungee.util.CaseInsensitiveMap;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -555,7 +557,13 @@ public class BungeeCord extends ProxyServer
     @Override
     public ServerInfo constructServerInfo(String name, InetSocketAddress address, String motd, boolean restricted)
     {
-        return new BungeeServerInfo( name, address, motd, restricted );
+        return this.constructServerInfo( name, address, motd, restricted, GlobalPing.class, ServerInfo.MotdCount.GLOBAL, 500 );
+    }
+
+    @Override
+    public ServerInfo constructServerInfo(String name, InetSocketAddress address, String motd, boolean restricted, Class<? extends TabListHandler> tablist, ServerInfo.MotdCount motdcount, int maxplayers )
+    {
+        return new BungeeServerInfo( name, address, motd, restricted, motdcount, maxplayers, tablist );
     }
 
     @Override

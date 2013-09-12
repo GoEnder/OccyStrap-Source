@@ -30,7 +30,7 @@ public class ListenerInfo
      */
     public ListenerInfo( InetSocketAddress host, String motd, int maxPlayers, int tabListSize, String defaultServer, String fallbackServer, boolean forceDefault, Map<String, String> forcedHosts, Class<? extends TabListHandler> tabList, boolean setLocalAddress )
     {
-        this(host, false, 25565, motd, maxPlayers, tabListSize, defaultServer, fallbackServer, forceDefault, forcedHosts, tabList, setLocalAddress);
+        this(host, false, 25565, tabListSize, defaultServer, fallbackServer, forceDefault, forcedHosts, setLocalAddress);
     }
 
     /**
@@ -45,14 +45,6 @@ public class ListenerInfo
      * Port for query protocol.
      */
     private final int queryPort;
-    /**
-     * Displayed MOTD.
-     */
-    private final String motd;
-    /**
-     * Max amount of slots displayed on the ping page.
-     */
-    private final int maxPlayers;
     /**
      * Number of players to be shown on the tab list.
      */
@@ -76,10 +68,6 @@ public class ListenerInfo
      * transferred depending on the host they connect to.
      */
     private final Map<String, String> forcedHosts;
-    /**
-     * Class used to build tab lists for this player.
-     */
-    private final Class<? extends TabListHandler> tabList;
     /**
      * Whether to set the local address when connecting to servers.
      */

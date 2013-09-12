@@ -14,6 +14,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.TaskScheduler;
 import net.md_5.bungee.api.tab.CustomTabList;
+import net.md_5.bungee.api.tab.TabListHandler;
 
 public abstract class ProxyServer
 {
@@ -193,6 +194,20 @@ public abstract class ProxyServer
      * @return the constructed instance
      */
     public abstract ServerInfo constructServerInfo(String name, InetSocketAddress address, String motd, boolean restricted);
+
+    /**
+     * Factory method to construct an implementation specific server info
+     * instance.
+     *
+     * @param name name of the server
+     * @param address connectable Minecraft address + port of the server
+     * @param motd the motd when used as a forced server
+     * @param restricted whether the server info restricted property will be set
+     * @param motdcount the way the current player count should be made in motd
+     * @param maxplayers if motdcount is global, the max amount of players to show
+     * @return the constructed instance
+     */
+    public abstract ServerInfo constructServerInfo(String name, InetSocketAddress address, String motd, boolean restricted, Class<? extends TabListHandler> tablist, ServerInfo.MotdCount motdcount, int maxplayers );
 
     /**
      * Returns the console overlord for this proxy. Being the console, this

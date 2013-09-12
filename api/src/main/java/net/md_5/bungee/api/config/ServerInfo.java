@@ -6,6 +6,7 @@ import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.tab.TabListHandler;
 
 /**
  * Class used to represent a server to connect to.
@@ -44,6 +45,26 @@ public interface ServerInfo
     String getMotd();
 
     /**
+     * Returns whether the current players in motd should represent all players
+     * connected to proxy or just to that server.
+     * 
+     * @return 
+     */
+    MotdCount getMotdCount();
+
+    /**
+     * Returns the max amount of slots displayed on the ping page.
+     * 
+     * @returns the max amount of players
+     */
+    int getMaxPlayers();
+
+    /**
+     * Class used to build tab lists for this player.
+     */
+    Class<? extends TabListHandler> getTabList();
+
+    /**
      * Whether the player can access this server. It will only return false when
      * the player has no permission and this server is restricted.
      *
@@ -66,4 +87,8 @@ public interface ServerInfo
      * @param callback the callback to call when the count has been retrieved.
      */
     void ping(Callback<ServerPing> callback);
+
+    public enum MotdCount {
+        GLOBAL, SERVER
+    }
 }

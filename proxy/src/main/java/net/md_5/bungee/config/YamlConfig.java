@@ -21,6 +21,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.config.ServerInfo.MotdCount;
 import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.tab.Global;
 import net.md_5.bungee.tab.GlobalPing;
@@ -170,10 +171,17 @@ public class YamlConfig implements ConfigurationAdapter
             Map<String, Object> val = entry.getValue();
             String name = entry.getKey();
             String addr = get( "address", "localhost:25565", val );
-            String motd = ChatColor.translateAlternateColorCodes( '&', get( "motd", "&1Just another BungeeCord - Forced Host", val ) );
+            String motd = ChatColor.translateAlternateColorCodes( '&', get( "ping.motd", "&1Just another BungeeCord - Forced Host", val ) );
+            MotdCount motdcount = MotdCount.valueOf( get( "ping.player_count", "GLOBAL", val ) );
+            int maxplayers = get( "ping.max_players", 1, val );
             boolean restricted = get( "restricted", false, val );
             InetSocketAddress address = Util.getAddr( addr );
-            ServerInfo info = ProxyServer.getInstance().constructServerInfo( name, address, motd, restricted );
+            String tabListName = get( "tab_list", "GLOBAL_PING", val );
+            DefaultTabList value = DefaultTabList.valueOf( tabListName );
+            if ( value == null ) {
+                value = DefaultTabList.GLOBAL_PING;
+            }
+            ServerInfo info = ProxyServer.getInstance().constructServerInfo( name, address, motd, restricted, value.clazz, motdcount, maxplayers );
             ret.put( name, info );
         }
 
@@ -198,25 +206,15 @@ public class YamlConfig implements ConfigurationAdapter
             String host = get( "host", "0.0.0.0:25577", val );
             boolean enableQuery = get( "enableQuery", true, val );
             int queryPort = get( "queryPort", 25577, val );
-            String motd = get( "motd", "&1Another Bungee server", val );
-            motd = ChatColor.translateAlternateColorCodes( '&', motd );
-
-            int maxPlayers = get( "max_players", 1, val );
             String defaultServer = get( "default_server", "lobby", val );
             String fallbackServer = get( "fallback_server", defaultServer, val );
             boolean forceDefault = get( "force_default_server", false, val );
             int tabListSize = get( "tab_size", 60, val );
             InetSocketAddress address = Util.getAddr( host );
             Map<String, String> forced = new CaseInsensitiveMap<>( get( "forced_hosts", forcedDef, val ) );
-            String tabListName = get( "tab_list", "GLOBAL_PING", val );
-            DefaultTabList value = DefaultTabList.valueOf( tabListName.toUpperCase() );
-            if ( value == null )
-            {
-                value = DefaultTabList.GLOBAL_PING;
-            }
             boolean setLocalAddress = get( "bind_local_address", true, val );
 
-            ListenerInfo info = new ListenerInfo( address, enableQuery, queryPort, motd, maxPlayers, tabListSize, defaultServer, fallbackServer, forceDefault, forced, value.clazz, setLocalAddress );
+            ListenerInfo info = new ListenerInfo( address, enableQuery, queryPort, tabListSize, defaultServer, fallbackServer, forceDefault, forced, setLocalAddress );
             ret.add( info );
         }
 

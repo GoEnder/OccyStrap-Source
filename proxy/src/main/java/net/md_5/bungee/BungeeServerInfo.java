@@ -22,6 +22,7 @@ import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.connection.PingHandler;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PipelineUtils;
@@ -43,6 +44,12 @@ public class BungeeServerInfo implements ServerInfo
     private final boolean restricted;
     @Getter
     private final Queue<DefinedPacket> packetQueue = new LinkedList<>();
+    @Getter
+    private final ServerInfo.MotdCount motdCount;
+    @Getter
+    private final int maxPlayers;
+    @Getter
+    private final Class<? extends TabListHandler> tabList;
 
     @Synchronized("players")
     public void addPlayer(ProxiedPlayer player)

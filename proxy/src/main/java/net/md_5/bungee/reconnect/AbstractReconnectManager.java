@@ -44,5 +44,15 @@ public abstract class AbstractReconnectManager implements ReconnectHandler
         return ProxyServer.getInstance().getServerInfo( forced );
     }
 
+    public static ServerInfo getMotdHost(PendingConnection con)
+    {
+        ServerInfo forced = getForcedHost( con );
+        if ( forced != null )
+        {
+            return forced;
+        }
+        return ProxyServer.getInstance().getServerInfo( con.getListener().getDefaultServer() );
+    }
+
     protected abstract ServerInfo getStoredServer(ProxiedPlayer player);
 }

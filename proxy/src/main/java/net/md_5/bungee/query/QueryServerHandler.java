@@ -23,6 +23,7 @@ import java.util.Random;
 import lombok.Data;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.BriefQueryEvent;
 import net.md_5.bungee.api.event.FullQueryEvent;
@@ -46,6 +47,10 @@ public class QueryServerHandler extends SimpleChannelInboundHandler<DatagramPack
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) throws Exception
     {
+        ListenerInfo info = ctx.channel().attr( PipelineUtils.LISTENER ).get();
+        // No virtual host in query protocol. This is the best way, i'm afraid.
+        ServerInfo serv = BungeeCord.getInstance().getServerInfo( info.getDefaultServer() );
+
         cleanChallenges();
 
         ByteBuf bytes = packet.content();
@@ -66,10 +71,10 @@ public class QueryServerHandler extends SimpleChannelInboundHandler<DatagramPack
                 }
                 if ( bytes.isReadable() )
                 {
-                    ctx.writeAndFlush( getPacket0Full( identities.get( packet.sender() ), ctx.channel().attr( PipelineUtils.LISTENER ).get() ) );
+                    ctx.writeAndFlush( getPacket0Full( identities.get( packet.sender() ), info, serv ) );
                 } else
                 {
-                    ctx.writeAndFlush( getPacket0Brief( identities.get( packet.sender() ), ctx.channel().attr( PipelineUtils.LISTENER ).get() ) );
+                    ctx.writeAndFlush( getPacket0Brief( identities.get( packet.sender() ), info, serv ) );
                 }
                 break;
             case 0x09:
@@ -117,13 +122,13 @@ public class QueryServerHandler extends SimpleChannelInboundHandler<DatagramPack
         }
     }
 
-    private DatagramPacket getPacket0Full(QueryIdentity identity, ListenerInfo info)
+    private DatagramPacket getPacket0Full(QueryIdentity identity, ListenerInfo info, ServerInfo serv)
     {
         long currentTime = System.currentTimeMillis();
         if ( currentTime - cacheTime > 5000L )
         {
             this.cacheTime = currentTime;
-            FullQueryResponse response = getFullQueryResponse( identity, info );
+            FullQueryResponse response = getFullQueryResponse( identity, info, serv);
             fullReplyCache = Unpooled.buffer();
             fullReplyCache.writeByte( 0 );
             fullReplyCache.writeBytes( identity.sessID );
@@ -162,9 +167,9 @@ public class QueryServerHandler extends SimpleChannelInboundHandler<DatagramPack
         }
     }
 
-    private DatagramPacket getPacket0Brief(QueryIdentity identity, ListenerInfo info)
+    private DatagramPacket getPacket0Brief(QueryIdentity identity, ListenerInfo info, ServerInfo serv)
     {
-        BriefQueryResponse response = getBriefQueryResponse( identity, info ); // fire an event.
+        BriefQueryResponse response = getBriefQueryResponse( identity, info, serv ); // fire an event.
         ByteBuf out = Unpooled.buffer();
         out.writeByte( 0 );
         out.writeBytes( identity.sessID );
@@ -207,17 +212,17 @@ public class QueryServerHandler extends SimpleChannelInboundHandler<DatagramPack
         return builder.toString();
     }
 
-    private FullQueryResponse getFullQueryResponse(QueryIdentity identity, ListenerInfo info)
+    private FullQueryResponse getFullQueryResponse(QueryIdentity identity, ListenerInfo info, ServerInfo serv)
     {
         ImmutableMap.Builder<String, String> mapbuilder = ImmutableMap.builder();
-        mapbuilder.put( "hostname", info.getMotd() );
+        mapbuilder.put( "hostname", serv.getMotd() );
         mapbuilder.put( "gametype", "SMP" );
         mapbuilder.put( "game_id", "MINECRAFT" );
         mapbuilder.put( "version", BungeeCord.getInstance().getGameVersion() );
         mapbuilder.put( "plugins", getPluginsValue() );
         mapbuilder.put( "map", "unknown" );
         mapbuilder.put( "numplayers", Integer.toString( BungeeCord.getInstance().getOnlineCount() ) );
-        mapbuilder.put( "maxplayers", Integer.toString( info.getMaxPlayers() ) );
+        mapbuilder.put( "maxplayers", Integer.toString( serv.getMaxPlayers() ) );
         mapbuilder.put( "hostport", Integer.toString( info.getHost().getPort() ) );
         mapbuilder.put( "hostip", info.getHost().getAddress().getHostAddress() );
         ImmutableMap map = mapbuilder.build();
@@ -237,15 +242,15 @@ public class QueryServerHandler extends SimpleChannelInboundHandler<DatagramPack
         return ev.getResponse();
     }
 
-    private BriefQueryResponse getBriefQueryResponse(QueryIdentity identity, ListenerInfo info)
+    private BriefQueryResponse getBriefQueryResponse(QueryIdentity identity, ListenerInfo info, ServerInfo serv)
     {
         BriefQueryEvent ev = BungeeCord.getInstance().getPluginManager().callEvent(
                 new BriefQueryEvent( identity.addr.getAddress(), new BriefQueryResponse(
-                info.getMotd(),
+                serv.getMotd(),
                 "SMP",
                 "unknown",
                 Integer.toString( BungeeCord.getInstance().getOnlineCount() ),
-                Integer.toString( info.getMaxPlayers() ),
+                Integer.toString( serv.getMaxPlayers() ),
                 (short) info.getHost().getPort(),
                 info.getHost().getAddress().getHostAddress() ) ) );
         return ev.getResponse();

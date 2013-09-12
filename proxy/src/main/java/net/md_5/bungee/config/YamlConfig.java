@@ -195,6 +195,9 @@ public class YamlConfig implements ConfigurationAdapter
 
         for ( Map<String, Object> val : base )
         {
+            String host = get( "host", "0.0.0.0:25577", val );
+            boolean enableQuery = get( "enableQuery", true, val );
+            int queryPort = get( "queryPort", 25577, val );
             String motd = get( "motd", "&1Another Bungee server", val );
             motd = ChatColor.translateAlternateColorCodes( '&', motd );
 
@@ -202,7 +205,6 @@ public class YamlConfig implements ConfigurationAdapter
             String defaultServer = get( "default_server", "lobby", val );
             String fallbackServer = get( "fallback_server", defaultServer, val );
             boolean forceDefault = get( "force_default_server", false, val );
-            String host = get( "host", "0.0.0.0:25577", val );
             int tabListSize = get( "tab_size", 60, val );
             InetSocketAddress address = Util.getAddr( host );
             Map<String, String> forced = new CaseInsensitiveMap<>( get( "forced_hosts", forcedDef, val ) );
@@ -214,7 +216,7 @@ public class YamlConfig implements ConfigurationAdapter
             }
             boolean setLocalAddress = get( "bind_local_address", true, val );
 
-            ListenerInfo info = new ListenerInfo( address, motd, maxPlayers, tabListSize, defaultServer, fallbackServer, forceDefault, forced, value.clazz, setLocalAddress );
+            ListenerInfo info = new ListenerInfo( address, enableQuery, queryPort, motd, maxPlayers, tabListSize, defaultServer, fallbackServer, forceDefault, forced, value.clazz, setLocalAddress );
             ret.add( info );
         }
 

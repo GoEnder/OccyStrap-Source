@@ -6,6 +6,7 @@ import net.md_5.bungee.reconnect.YamlReconnectHandler;
 import net.md_5.bungee.scheduler.BungeeScheduler;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
@@ -13,6 +14,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 import net.md_5.bungee.config.Configuration;
@@ -61,6 +63,7 @@ import net.md_5.bungee.protocol.packet.DefinedPacket;
 import net.md_5.bungee.protocol.packet.Packet3Chat;
 import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
 import net.md_5.bungee.protocol.Vanilla;
+import net.md_5.bungee.query.QueryServerHandler;
 import net.md_5.bungee.tab.Custom;
 import net.md_5.bungee.util.CaseInsensitiveMap;
 import org.fusesource.jansi.AnsiConsole;
@@ -93,6 +96,11 @@ public class BungeeCord extends ProxyServer
      * Server socket listener.
      */
     private Collection<Channel> listeners = new HashSet<>();
+    /**
+     * Query socket listener.
+     */
+    private Collection<Channel> queryListeners = new HashSet<>();
+
     /**
      * Fully qualified connections.
      */
@@ -293,6 +301,32 @@ public class BungeeCord extends ProxyServer
                     .group( eventLoops )
                     .localAddress( info.getHost() )
                     .bind().addListener( listener );
+            if ( info.isEnableQuery() )
+            {
+                listener = new ChannelFutureListener()
+                {
+                    @Override
+                    public void operationComplete(ChannelFuture future) throws Exception
+                    {
+                        if ( future.isSuccess() )
+                        {
+                            queryListeners.add( future.channel() );
+                            getLogger().info( "Query Listening on " + info.getHost() );
+                        } else
+                        {
+                            getLogger().log( Level.WARNING, "Query Could not bind to host " + info.getHost(), future.cause() );
+                        }
+                    }
+                };
+                new Bootstrap()
+                        .channel( NioDatagramChannel.class )
+                        .attr( PipelineUtils.LISTENER, info )
+                        .group( eventLoops )
+                        .localAddress( new InetSocketAddress( info.getHost().getAddress(), info.getQueryPort() ) )
+                        .handler( new QueryServerHandler() )
+                        .bind().addListener( listener );
+
+            }
         }
     }
 
@@ -310,6 +344,18 @@ public class BungeeCord extends ProxyServer
             }
         }
         listeners.clear();
+        for ( Channel listener : queryListeners )
+        {
+            getLogger().log( Level.INFO, "Query Closing listener {0}", listener );
+            try
+            {
+                listener.close().syncUninterruptibly();
+            } catch ( ChannelException ex )
+            {
+                getLogger().severe( "Query Could not close listen thread" );
+            }
+        }
+        queryListeners.clear();
     }
 
     @Override
@@ -363,7 +409,7 @@ public class BungeeCord extends ProxyServer
                     try
                     {
                         plugin.onDisable();
-                    } catch (Throwable t)
+                    } catch ( Throwable t )
                     {
                         getLogger().severe( "Exception disabling plugin " + plugin.getDescription().getName() );
                         t.printStackTrace();

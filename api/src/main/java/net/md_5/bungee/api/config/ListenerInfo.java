@@ -3,6 +3,7 @@ package net.md_5.bungee.api.config;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.api.tab.TabListHandler;
 
 /**
@@ -10,13 +11,40 @@ import net.md_5.bungee.api.tab.TabListHandler;
  * multiple listeners on different ports.
  */
 @Data
+@RequiredArgsConstructor
 public class ListenerInfo
 {
+
+    /**
+     * BungeeCord non-modified constructor. Provided for plugin compability.
+     * @param host 
+     * @param motd
+     * @param maxPlayers
+     * @param tabListSize
+     * @param defaultServer
+     * @param fallbackServer
+     * @param forceDefault
+     * @param forcedHosts
+     * @param tabList
+     * @param setLocalAddress 
+     */
+    public ListenerInfo( InetSocketAddress host, String motd, int maxPlayers, int tabListSize, String defaultServer, String fallbackServer, boolean forceDefault, Map<String, String> forcedHosts, Class<? extends TabListHandler> tabList, boolean setLocalAddress )
+    {
+        this(host, false, 25565, motd, maxPlayers, tabListSize, defaultServer, fallbackServer, forceDefault, forcedHosts, tabList, setLocalAddress);
+    }
 
     /**
      * Host to bind to.
      */
     private final InetSocketAddress host;
+    /**
+     * Enable query protocol.
+     */
+    private final boolean enableQuery;
+    /**
+     * Port for query protocol.
+     */
+    private final int queryPort;
     /**
      * Displayed MOTD.
      */

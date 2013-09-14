@@ -1,6 +1,8 @@
 package net.md_5.bungee.api.plugin;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.eventbus.Subscribe;
 import java.io.File;
 import java.io.InputStream;
@@ -9,8 +11,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.jar.JarEntry;
@@ -42,6 +47,8 @@ public class PluginManager
     private final Map<String, Plugin> plugins = new LinkedHashMap<>();
     private final Map<String, Command> commandMap = new HashMap<>();
     private Map<String, PluginDescription> toLoad = new HashMap<>();
+    private final Multimap<Plugin, Listener> listenersByPlugin = HashMultimap.create();
+    private final Multimap<Plugin, Command> commandsByPlugin = HashMultimap.create();
 
     @SuppressWarnings("unchecked")
     public PluginManager(ProxyServer proxy)
@@ -58,10 +65,27 @@ public class PluginManager
      */
     public void registerCommand(Plugin plugin, Command command)
     {
+        if( plugin != null)
+            commandsByPlugin.put( plugin, command );
         commandMap.put( command.getName().toLowerCase(), command );
         for ( String alias : command.getAliases() )
         {
             commandMap.put( alias.toLowerCase(), command );
+        }
+    }
+
+    /**
+     * Unregister all commands for a plugin.
+     *
+     * @param plugin the plugin.
+     */
+    public void unregisterCommands(Plugin plugin)
+    {
+        if (!commandsByPlugin.containsKey( plugin )) return;
+        for( Iterator<Command> it = commandsByPlugin.get( plugin ).iterator(); it.hasNext() ; )
+        {
+            commandMap.values().remove( it.next() );
+            it.remove();
         }
     }
 
@@ -72,7 +96,8 @@ public class PluginManager
      */
     public void unregisterCommand(Command command)
     {
-        commandMap.values().remove( command );
+        commandMap.values().removeAll( Collections.singleton( command ) );
+        commandsByPlugin.values().removeAll( Collections.singleton( command ) );
     }
 
     /**
@@ -171,7 +196,7 @@ public class PluginManager
             }
         }
         toLoad.clear();
-        toLoad = null;
+        // toLoad = null;
 
         for ( Plugin plugin : plugins.values() )
         {
@@ -343,7 +368,72 @@ public class PluginManager
         {
             Preconditions.checkArgument( !method.isAnnotationPresent( Subscribe.class ),
                     "Listener %s has registered using deprecated subscribe annotation! Please update to @EventHandler.", listener );
+            eventBus.register( listener );
+            listenersByPlugin.put( plugin, listener );
         }
-        eventBus.register( listener );
+    }
+
+    /**
+     * Disable all loaded plugins.
+     */
+    public void disablePlugins(){
+        for (Iterator<Plugin> it = plugins.values().iterator(); it.hasNext(); )
+        {
+            disablePlugin( it.next() );
+            it.remove();
+        }
+    }
+
+    /**
+     * Use to disable a plugin.
+     *
+     * @param plugin the plugin to disable.
+     */
+    public void disablePlugin( Plugin plugin )
+    {
+        try 
+        {
+            final String name = plugin.getDescription().getName();
+            plugin.onDisable();
+            unregisterListeners( plugin );
+            unregisterCommands( plugin );
+            ProxyServer.getInstance().getLogger().log( Level.INFO, "Plugin {0} disabled!", new Object[]{
+                   name
+            } );
+        } catch ( Exception e )
+        {
+            ProxyServer.getInstance().getLogger().log( Level.SEVERE, "There was an error disabling {0}! Report this error to {1}, the plugin author!", new Object[]{
+                    plugin.getDescription().getName(), plugin.getDescription().getAuthor()
+            } );
+        }
+    }
+
+
+    /**
+     * Unregister a selected listener.
+     *
+     * @param listener the listener.
+     */
+    public void unregisterListener( Listener listener )
+    {
+        eventBus.unregister( listener );
+        listenersByPlugin.values().removeAll( Collections.singleton( listener ) );
+    }
+
+    /**
+     * Unregister a selected plugin's listeners.
+     *
+     * @param plugin the plugin.
+     */
+    public void unregisterListeners( Plugin plugin ) 
+    {
+        if ( !listenersByPlugin.containsKey( plugin ) )
+            return;
+
+        for( Iterator<Listener> it = listenersByPlugin.get( plugin ).iterator(); it.hasNext(); )
+        {
+            eventBus.unregister( it.next() );
+            it.remove();
+        }
     }
 }
